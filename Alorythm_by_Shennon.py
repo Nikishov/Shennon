@@ -52,6 +52,22 @@ class Coder:
         'ю':[arr[30],0,0.0,''],
         'я':[arr[31],0,0.0,'']
         }
+
+        t = text.get(1.0, 'end').lower()
+        for t_mini in t:
+            try:
+                word[t_mini]
+            except:
+                pass
+            else:
+                self.text += t_mini
+
+        for word_mini in self.text:
+            try:
+                word[word_mini][0] += 1
+            except:
+                pass
+
         def Translate(arg, l):
             num = ""
             for i in range(0,l):
@@ -61,8 +77,8 @@ class Coder:
                     arg -= 1.0
             return num
 
-        for word_mini in self.text:
-            id_1[word_mini][0] += 1
+        # for word_mini in self.text:
+        #     id_1[word_mini][0] += 1
 
         for k in id_1.keys():
             if id_1[k][0] != 0.0:
@@ -102,8 +118,8 @@ class Coder:
             except:
                 pass
             else:
-                print(id_3[string], end = '')
-                string = ''
+                text_code.insert('end', id_3[line])
+                line = ''
         
 
       
@@ -124,8 +140,10 @@ def open_file():
         
 
 
-
+code = Coder()
 def coding_file():
+    code.text = text.get(1.0, 'end')
+    code.Coding()
     text_code.insert(1.0, text.get(1.0, 'end'))
         
 
