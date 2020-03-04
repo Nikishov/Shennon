@@ -3,18 +3,14 @@ import collections
 import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import *
-
+import pickle
+id_3 = {}
 class Coder:
     text = ''
     coded_text=''
     id_2 = {}
     def Coding(self):
         sum = 0.0
-        test = []
-        spisok_luck = []
-        spisok_l = []
-        spisok_sum = []
-        
         arr = [] 
         for i in range(0, 32):
             arr.append(0)
@@ -56,7 +52,7 @@ class Coder:
         t = text.get(1.0, 'end').lower()
         for t_mini in t:
             try:
-                word[t_mini]
+                id_1[t_mini]
             except:
                 pass
             else:
@@ -64,7 +60,7 @@ class Coder:
 
         for word_mini in self.text:
             try:
-                word[word_mini][0] += 1
+                id_1[word_mini][0] += 1
             except:
                 pass
 
@@ -93,22 +89,13 @@ class Coder:
             self.id_2[k][3] = Translate(self.id_2[k][2], self.id_2[k][1])
             
 
-        print("Закодированное сообщение")
         for w in self.text:
-            spisok_luck.append(self.id_2[w][0])
-            spisok_l.append(self.id_2[w][1])
-            spisok_sum.append(self.id_2[w][2])
-            print(self.id_2[w][3])
             self.coded_text += self.id_2[w][3]
-        print()
-        print("Вероятность появления:", spisok_luck)
-        print("Коэффицент l:", spisok_l)
-        print("Сумма:", spisok_sum)
+        text_code.insert(1.0, self.coded_text)
     
 
     def Decoding(self):
         string = ''
-        id_3 = {}
         for k,i in self.id_2.items():
             id_3[i[3]] = k
         for i in self.coded_text:
@@ -120,6 +107,7 @@ class Coder:
             else:
                 text_code.insert('end', id_3[line])
                 line = ''
+                
         
 
       
@@ -138,18 +126,28 @@ def open_file():
     with open(fl, 'r', encoding='utf-8') as f:
         text.insert(1.0, f.read())
         
-
-
 code = Coder()
 def coding_file():
-    code.text = text.get(1.0, 'end')
     code.Coding()
-    text_code.insert(1.0, text.get(1.0, 'end'))
-        
+    
+def save_file():
+    new_file = fd.asksaveasfilename(filetypes=(('texts', '*.txt'), ('All files', '*.*')), defaultextension='.txt')
+    with open(new_file, 'w') as f:
+        f.write(text_code.get(1.0, 'end'))
+    new_file = fd.asksaveasfilename(filetypes=(('texts', '*.txt'), ('All files', '*.*')), defaultextension='.txt')
+    with open(new_file, 'wb') as f:
+        pickle.dump(code.id_2, f)
+
+def decode_file():
+    file_name = fd.askopenfilename(filetypes=(('texts', '*.txt'), ('All files', '*.*')))
+    with open(file_name, 'rb') as f:
+        code.id_2 = pickle.load(f)
+    code.Decoding()
+    
 
 root = tk.Tk()
 form = tk
-root.geometry("400x300")
+
 root.wm_title("Алгорим Шеннона")
 root.wm_resizable(width=True, height=True)
 text = tk.Text(width=25, height=5, bg="darkgreen", fg='white', wrap=WORD)
@@ -160,6 +158,9 @@ button_open = tk.Button(root,text='Открыть', height=3, width=20, command=
 button_open.grid(row = 3)
 button_code = tk.Button(root, text='Кодировать', height=3, width=20, command=coding_file)
 button_code.grid(row = 3, column = 2)
-
+button_save = tk.Button(root, text='Сохранить', height=3, width=20, command=save_file)
+button_save.grid(row = 5, column = 1)
+button_decode = tk.Button(root, text='Декодировать', height=3, width=20, command=decode_file)
+button_decode.grid(row = 7, column = 1)
 
 root.mainloop()
