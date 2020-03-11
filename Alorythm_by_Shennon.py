@@ -98,32 +98,21 @@ class Coder:
         string = ''
         for k,i in self.id_2.items():
             id_3[i[3]] = k
-        for i in self.coded_text:
+        temp = '00' + self.coded_text
+        for i in temp:
             string += i
             try:
                 id_3[string]
             except:
                 pass
             else:
-                text_code.insert('end', id_3[line])
-                line = ''
-                
-        
-
-      
-#child = Coder()
-# child.text = input()
-# child.Coding()
-# print()
-# l = (''.join(format(ord(x), 'b') for x in child.text))
-# print('ASCII:',l)
-# print('Shennon:',child.coded_text)
-# print("Коэффициент  сжатия:", len(l)/len(child.coded_text))
-# child.Decoding()
-
+                text_code.insert('end', id_3[string])
+                string = ''
+        print(id_3)
 def open_file():
     fl = fd.askopenfilename(filetypes=(('texts', '*.txt'), ('All files', '*.*')))
     with open(fl, 'r', encoding='utf-8') as f:
+        text.delete(1.0, 'end')
         text.insert(1.0, f.read())
         
 code = Coder()
@@ -132,22 +121,29 @@ def coding_file():
     
 def save_file():
     new_file = fd.asksaveasfilename(filetypes=(('texts', '*.txt'), ('All files', '*.*')), defaultextension='.txt')
-    with open(new_file, 'w') as f:
-        f.write(text_code.get(1.0, 'end'))
+    temp_code = [int(code.coded_text[x:x+8],2) for x in range(0, len(code.coded_text), 8)]
+    temp_bytes = bytes(temp_code)
+    with open(new_file, 'wb') as f:
+        f.write(temp_bytes)
     new_file = fd.asksaveasfilename(filetypes=(('texts', '*.txt'), ('All files', '*.*')), defaultextension='.txt')
     with open(new_file, 'wb') as f:
         pickle.dump(code.id_2, f)
 
+
 def decode_file():
+    text.delete(1.0, 'end')
+    file_name = fd.askopenfilename(filetypes=(('texts', '*.txt'), ('All files', '*.*')))
+    with open(file_name, 'rb') as f:
+        temp_int = int.from_bytes(f.read(), byteorder='big')
+        code.coded_text = "{0:b}".format(temp_int)
     file_name = fd.askopenfilename(filetypes=(('texts', '*.txt'), ('All files', '*.*')))
     with open(file_name, 'rb') as f:
         code.id_2 = pickle.load(f)
+    text_code.delete(1.0, 'end')
     code.Decoding()
-    
 
 root = tk.Tk()
 form = tk
-
 root.wm_title("Алгорим Шеннона")
 root.wm_resizable(width=True, height=True)
 text = tk.Text(width=25, height=5, bg="darkgreen", fg='white', wrap=WORD)
@@ -162,5 +158,4 @@ button_save = tk.Button(root, text='Сохранить', height=3, width=20, com
 button_save.grid(row = 5, column = 1)
 button_decode = tk.Button(root, text='Декодировать', height=3, width=20, command=decode_file)
 button_decode.grid(row = 7, column = 1)
-
 root.mainloop()
